@@ -1,0 +1,50 @@
+#!/usr/bin/env perl
+package Bio::Concordance::GetConcordance;
+
+# ABSTRACT: Given an alignment and a list of positions, summarise the concordance between them
+# PODNAME: get_concordance
+=head1 SYNOPSIS
+
+HELP TEXT
+
+=cut
+
+use Moose;
+use Getopt::Long;
+use Bio::Concordance;
+use Bio::Concordance::ParsePositions;
+
+my ( $aln_file, $positions_file, $output_prefix, $help );
+
+GetOptions(
+	'a|aln_file=s'      => \$aln_file,
+	'p|positions=s'     => \$positions_file,
+	'o|output_prefix=s' => \$output_prefix,
+	'h|help'            => \$help
+);
+
+( -e $aln_file ) or die( "Cannot find file: $aln_file\n" );
+( -e $positions_file ) or die( "Cannot find file: $positions_file\n" );
+( !$help ) or die( _usage_text() );
+
+Bio::Concordance->new(
+	alignment_file => $aln_file,
+	positions_file => $positions_file,
+	output_prefix  => $output_prefix
+)->run;
+
+
+sub _usage_text {
+	return <<USAGE;
+Usage: $0 [options]
+
+a|aln_file			Input alignment FastA
+p|positions 		File of positions of interest (one per line)
+o|output_prefix		Prefix name for output alignments
+h|help 				This help text
+
+# Basic usage
+get_concordance -a my_alignment.fa -p positions.txt -o my_output
+
+USAGE
+}
